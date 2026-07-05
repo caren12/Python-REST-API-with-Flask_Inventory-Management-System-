@@ -7,10 +7,6 @@ product details (name, brand, ingredients) from the free
 database using a barcode or product name — no need to type everything
 in by hand.
 
-**No coding experience needed to use this** — once it's set up, you
-interact with it through a plain text menu (see "Using the CLI" below).
-
----
 
 ## What's in this project
 
