@@ -49,28 +49,32 @@ def test_lookup_by_barcode_not_found(mock_get):
 
 @patch("product_lookup.requests.get")
 def test_lookup_by_name_success(mock_get):
+    # This mirrors what the real search API actually returns: 'brands' as
+    # a list, and no 'ingredients_text' - only coded 'ingredients_tags'.
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "products": [{
-            "product_name": "Peanut Butter",
-            "brands": "Jif",
-            "ingredients_text": "Peanuts, sugar, salt",
-            "code": "111222333",
+        "hits": [{
+            "product_name": "Nutella & go! hazelnut spread + breadsticks",
+            "brands": ["Nutella"],
+            "ingredients_tags": ["en:wheat-flour", "en:palm-oil", "en:salt"],
+            "code": "0009800800049",
         }]
     }
     mock_get.return_value = mock_response
 
-    result = product_lookup.lookup_by_name("peanut butter")
-    assert result["product_name"] == "Peanut Butter"
-    assert result["barcode"] == "111222333"
+    result = product_lookup.lookup_by_name("nutella")
+    assert result["product_name"] == "Nutella & go! hazelnut spread + breadsticks"
+    assert result["brand"] == "Nutella"
+    assert result["barcode"] == "0009800800049"
+    assert "wheat flour" in result["ingredients"]
 
 
 @patch("product_lookup.requests.get")
 def test_lookup_by_name_not_found(mock_get):
     mock_response = Mock()
     mock_response.status_code = 200
-    mock_response.json.return_value = {"products": []}
+    mock_response.json.return_value = {"hits": []}
     mock_get.return_value = mock_response
 
     result = product_lookup.lookup_by_name("nonexistent thing")
